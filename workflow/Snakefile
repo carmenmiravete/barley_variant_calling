@@ -8,3 +8,26 @@ rule map_reads:
         "envs/mapping.yaml"
     shell:
         "bwa mem {input} | samtools view -b - > {output}"
+
+#Names of samples reads in string format 
+
+rule quality_control:
+    input:
+        "data/samples/{samples}.fastq"
+    output:
+        "results/reports/{samples}.html"
+    shell:
+        "fastqc {input} | mv *html {output}"
+
+
+rule map_reads:
+    input:
+        "data/GCA_904849725_genome.fa",
+        "data/samples/{sample}.fastq"
+    output:
+        "results/mapped/{sample}.bam"
+    conda:
+        "envs/mapping.yaml"
+    shell:
+        "bwa mem {input} | samtools view -b - > {output}"
+
