@@ -1,9 +1,9 @@
-**PROJECT CSIC PRACTICE**
+# **PROJECT CSIC PRACTICE**
 
 Genome reference MorexV
 Samples: 32 samples of barely
 
-1. QUALITY CONTROL
+## 1. QUALITY CONTROL
 
 I will start the project doing a QUality Control with FastQC. These sequences must be verified for quality control, to ensure that the raw data does not have problems that could affect the biological analysis. 
 
