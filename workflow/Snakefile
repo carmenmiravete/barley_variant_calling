@@ -1,15 +1,10 @@
-rule map_reads:
+rule descompress:
     input:
-        "data/GCA_904849725_genome.fa,
-        "data/samples/{sample}.fastq"
+        "data/compressed_samples/{sample}.fastq.gz"
     output:
-        "results/mapped/{sample}.bam"
-    conda:
-        "envs/mapping.yaml"
+        "data/samples/{sample}.fastq"
     shell:
-        "bwa mem {input} | samtools view -b - > {output}"
-
-#Names of samples reads in string format 
+        "gunzip -c {input} > {output}" 
 
 rule quality_control:
     input:
