@@ -1,10 +1,17 @@
 # **PROJECT CSIC PRACTICE**
 
+#Introduction
+
+The main objective is to analyse the variant calling with GATK. To achive that goal I will follow the following process.
+
+1. Quality Control
+1. [1.QUALITY CONTROL](#1-QUALITY-CONTROL)
+
 Genome reference MorexV
+Samples: 32 samples of barley
 
-Samples: 32 samples of barely
 
-## 1. QUALITY CONTROL
+## 1.QUALITY CONTROL
 
 I will start the project doing a QUality Control with FastQC. These sequences must be verified for quality control, to ensure that the raw data does not have problems that could affect the biological analysis. 
 
