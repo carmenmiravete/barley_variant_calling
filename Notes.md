@@ -15,6 +15,12 @@ The main objective is to analyse the variant calling with GATK. To achive that g
 Genome reference MorexV
 Samples: 32 samples of barley
 
+## 0. DESCOMPRESS FILES
+It is possible that the files are compressed.
+
+I made a rule descompressed:
+
+In the terminal: snakemake -p data/samples/{A_1_21_1,A_1_21_2}.fastq -c4
 
 ## 1. QUALITY CONTROL
 
