@@ -28,6 +28,11 @@ rule genome_index:
         "data/GCA_genome.fa"
     shell:
         "bwa index -a bwtsw data/GCA_904849725_genome.fa"
+
+rule run_all: --> VA AL PRINICPIO, PERO LO HE PUESTO ANTES DE MAPEAR Y ORDENAR PARA COMPROBARLO
+    input:
+        "results/sorted/{sample}.sorted.bam"
+
 #STep 3: MAPPING tic
 rule map_reads:
     input:
