@@ -55,3 +55,32 @@ rule sort_bam:
     shell:
         "samtools sort -o {output} {input}"
 
+rule run_all:
+    input:
+        "results/sorted/{sample}.sorted.bam"
+
+
+#Step 3: MAPPING
+rule map_reads:
+    input:
+        "data/GCA_904849725_genome.fa",
+        "data/samples/{sample}.fastq"
+    output:
+        "results/mapped/{sample}.bam"
+    conda:
+        "env/mapping.yaml"
+    shell:
+        "bwa mem {input} | samtools view -Sb - > {output}"
+
+#Step 4: SORT
+
+rule sort_bam:
+    input:
+        "results/mapped/{sample}.bam"
+    output:
+        "results/sorted/{sample}_sorted.bam"
+    conda:
+        "env/mapping.yaml"
+    shell:
+        "samtools sort -o {output} {input}"
+
