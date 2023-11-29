@@ -20,6 +20,15 @@ rule quality_control:
     shell:
         "fastqc {input} | mv {output} > results/reports"
 
+#If the genome is not indexed 
+rule genome_index:
+    input:
+        "data/GCA_904849725_genome.fa"
+    output:
+        "data/GCA_genome.fa"
+    shell:
+        "bwa index -a bwtsw data/GCA_904849725_genome.fa"
+
 #Step 3: Mapping
 rule map_reads:
     input:
