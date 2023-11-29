@@ -31,4 +31,13 @@ rule map_reads:
         "envs/mapping.yaml"
     shell:
         "bwa mem {input} | samtools view -b - > {output}"
+#Step 4: Sort .bam reads
+rule sorted_bam:
+    input:
+        "results/mapped/{sample}.bam"
+    output:
+        "results/sorted_reads/{sample}.bam"
+    shell:
+        "samtools sort -T results/sorted_reads"
+        "-O bam {input} > {output}"
 
