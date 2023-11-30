@@ -86,6 +86,13 @@ rule sort_bam:
 
 #Step 5: Depth calculation
 
+rule depth_calc:
+    input:
+        "results/mapped/{sample}.bam"
+    output:
+        "results/depth/{sample}_depth.csv"
+    shell:
+        "samtools depth {input} > {output}"
 
 #Step 6: Show th depth in a plot
 
