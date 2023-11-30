@@ -60,6 +60,11 @@ rule variant_discovery: --> encontrar el error
         "results/variant_discovery/{sample}_HC.g.vcf"
     shell:
          "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -bamount bamount.bam"
+
+traduccion terminal:
+/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options '-Xmx4g' HaplotypeCaller \ -R data/GCA_904849725_genome.fa \-I results/sorted/A_1_21_sorted.bam \ -O results/variants_discovery/A_1_21_variants.g.vcf.gz \ -bamount bamount.bam
+
+
 ------------------------------------------------------------------------------------------------------------------------
 #STep 3: MAPPING tic
 rule map_reads:
