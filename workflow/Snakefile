@@ -1,38 +1,66 @@
-rule all: #this is to start with that file (in terminal: snakemake -n)
-    input:
-        "plots/quals.svg"
+samples=["A_1_21"]
 
-
-#Step 1: DESCOMPRESS tic
-rule descompress:
+rule all:
     input:
-        "data/compressed_samples/{samples}.fastq.gz"
+       expand("results/variant_discovery/{sample}_HC.g.vcf",sample=samples)
+
+rule map_reads:
+    input:
+        genome="data/GCA_904849725_genome.fa",
+        read1="data/samples/{sample}_1.fastq",
+        read2="data/samples/{sample}_2.fastq"
     output:
-        "data/samples/{samples}.fastq"
+        "results/mapped/{sample}.bam"
+    conda:
+        "env/mapping.yaml"
     shell:
-        "gunzip -c {input} > {output}" 
-#Step 2: QUALITY CONTROL tic
-rule quality_control:
+        "bwa mem {input.genome} {input.read1} {input.read2} | samtools view -Sb - > {output}"
+
+rule sort_bam:
     input:
-        "data/samples/{samples}.fastq"
+        "results/mapped/{sample}.bam"
     output:
-        "data/samples/{samples}_fastqc.html"
+        "results/sorted/{sample}_sorted.bam"
+    conda:
+        "env/mapping.yaml"
     shell:
-        "fastqc {input} | mv {output} > results/reports"
+        "samtools sort -o {output} {input}"
 
-#If the genome is not indexed 
-rule genome_index:
-    input:
-        "data/GCA_904849725_genome.fa"
+#rule depth_calc:
+#    input:
+#        "results/sorted/{sample}_sorted.bam"
+#    output:
+#        "results/depth/{sample}_depth.csv"
+#    shell:
+#        "samtools depth {input} > {output}"
+
+#rule plot_depth:
+#    input:
+#        "results/depth/{sample}_depth.csv"
+#    output:
+#        "results/depth/plots/{sample}.svg"
+#    script:
+#        "plot-depth.py"
+
+rule mark_duplicates:
+    input: 
+        "results/sorted/{sample}_sorted.bam"
     output:
-        "data/GCA_genome.fa"
+        marked_bam="results/duplicated/{sample}_marked.bam",
+        metrics="results/duplicated/{sample}_marked.txt"
     shell:
-        "bwa index -a bwtsw data/GCA_904849725_genome.fa"
+        "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk MarkDuplicates -I {input} -O {output.marked_bam} -M {output.metrics} "
 
-rule run_all: --> VA AL PRINICPIO, PERO LO HE PUESTO ANTES DE MAPEAR Y ORDENAR PARA COMPROBARLO
+rule variant_discovery: --> encontrar el error
     input:
-        "results/sorted/{sample}.sorted.bam"
+        ref= "data/GCA_904849725_genome.fa",
+        bam= "results/duplicated/{sample}_marked.bam"
 
+    output:
+        "results/variant_discovery/{sample}_HC.g.vcf"
+    shell:
+         "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -bamount bamount.bam"
+------------------------------------------------------------------------------------------------------------------------
 #STep 3: MAPPING tic
 rule map_reads:
     input:
