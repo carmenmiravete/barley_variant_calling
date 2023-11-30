@@ -104,4 +104,20 @@ rule plot_depth:
     script:
         "plot-depth.py"
 
+SAMPLES= ["A_1_21_1", "A_1_21_2"]  
+
+rule all:
+    input:
+        expand("results/duplicated/{sample}_marked.bam", sample=SAMPLES),
+        expand("results/duplicated/{sample}_marked.txt", sample=SAMPLES)
+
+
+rule mark_duplicates:
+    input: 
+        "results/sorted/{sample}_sorted.bam"
+    output:
+        marked_bam="results/duplicated/{sample}_marked.bam",
+        metrics="results/duplicated/{sample}_marked.txt"
+    shell:
+        "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk MarkDuplicates -I {input} -O {output.marked_bam} -M {output.metrics} "
 
