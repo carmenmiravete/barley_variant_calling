@@ -108,8 +108,7 @@ SAMPLES= ["A_1_21_1", "A_1_21_2"]
 
 rule all:
     input:
-        expand("results/duplicated/{sample}_marked.bam", sample=SAMPLES),
-        expand("results/duplicated/{sample}_marked.txt", sample=SAMPLES)
+        expand("results/variant_discovery/{sample}_HC.g.vcf.gz", sample=SAMPLES)
 
 
 rule mark_duplicates:
@@ -120,4 +119,20 @@ rule mark_duplicates:
         metrics="results/duplicated/{sample}_marked.txt"
     shell:
         "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk MarkDuplicates -I {input} -O {output.marked_bam} -M {output.metrics} "
+
+#rule recalibration:
+#    input:
+#        ""
+
+rule variant_discovery:
+    input:
+        ref= "data/GCA_904849725_genome.fa",
+        bam= "results/duplicated/{sample}_marked.bam"
+
+    output:
+        "results/variant_discovery/{sample}_HC.g.vcf.gz"
+
+    shell:
+         "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options '-Xmx4g' HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -ERC GVCF" 
+
 
