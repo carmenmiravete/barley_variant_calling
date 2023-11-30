@@ -84,3 +84,17 @@ rule sort_bam:
     shell:
         "samtools sort -o {output} {input}"
 
+#Step 5: Depth calculation
+
+
+#Step 6: Show th depth in a plot
+
+rule plot_depth:
+    input:
+        "results/depth/{sample}_depth.csv"
+    output:
+        "results/depth/plots/{sample}.svg"
+    script:
+        "plot-depth.py"
+
+
