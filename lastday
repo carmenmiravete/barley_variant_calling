@@ -1,0 +1,64 @@
+samples=["A_1_21"]
+
+rule all:
+    input:
+       expand("results/variant_discovery/{sample}_HC.g.vcf",sample=samples)
+
+rule map_reads:
+    input:
+        genome="data/GCA_904849725_genome.fa",
+        read1="data/samples/{sample}_1.fastq",
+        read2="data/samples/{sample}_2.fastq"
+    output:
+        "results/mapped/{sample}.bam"
+    conda:
+        "env/mapping.yaml"
+    shell:
+        "bwa mem {input.genome} {input.read1} {input.read2} | samtools view -Sb - > {output}"
+
+rule sort_bam:
+    input:
+        "results/mapped/{sample}.bam"
+    output:
+        "results/sorted/{sample}_sorted.bam"
+    conda:
+        "env/mapping.yaml"
+    shell:
+        "samtools sort -o {output} {input}"
+
+#rule depth_calc:
+#    input:
+#        "results/sorted/{sample}_sorted.bam"
+#    output:
+#        "results/depth/{sample}_depth.csv"
+#    shell:
+#        "samtools depth {input} > {output}"
+
+#rule plot_depth:
+#    input:
+#        "results/depth/{sample}_depth.csv"
+#    output:
+#        "results/depth/plots/{sample}.svg"
+#    script:
+#        "plot-depth.py"
+
+rule mark_duplicates:
+    input: 
+        "results/sorted/{sample}_sorted.bam"
+    output:
+        marked_bam="results/duplicated/{sample}_marked.bam",
+        metrics="results/duplicated/{sample}_marked.txt"
+    shell:
+        "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk MarkDuplicates -I {input} -O {output.marked_bam} -M {output.metrics}  "
+
+rule variant_discovery:
+    input:
+        ref= "data/GCA_904849725_genome.fa",
+        bam= "results/duplicated/{sample}_marked.bam"
+
+    output:
+        "results/variant_discovery/{sample}_HC.g.vcf"
+    shell:
+         "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -bamount bamount.bam"
+
+
