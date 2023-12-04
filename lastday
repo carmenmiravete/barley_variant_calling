@@ -61,4 +61,22 @@ rule variant_discovery:
     shell:
          "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -bamount bamount.bam"
 
+prueba de ordenar e indexar
+
+rule sort_bam:
+    input:
+        "results/duplicated/{sample}_marked.bam"
+    output:
+        "results/sorted/{sample}_markedsorted.bam"
+    conda:
+        "env/mapping.yaml"
+    shell:
+        "samtools sort -o {output} {input}"
+rule index:
+   input: 
+     "results/sorted/{sample}_markedsorted.bam"
+   output:
+      "results/indexed/{sample}_marked.bam.bai"
+   shell:
+      "samtools index -M {output} {input}"
 
