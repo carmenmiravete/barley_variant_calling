@@ -105,6 +105,10 @@ rule map_reads:
     shell:
         "bwa mem {input} | samtools view -Sb - > {output}"
 
+To solve the RG error
+bwa mem -t4 -M -R '@RG\tID:barley_${wildcards.sample}\tSM:sample_${wildcards.sample}\tLB:Lib1\tPL:ILLUMINA' {input.genome} {input.read1} {input.read2} | samtools view -Sb - > {output}"
+
+
 #Step 4: SORT
 
 rule sort_bam:
@@ -168,4 +172,34 @@ rule variant_discovery:
     shell:
          "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options '-Xmx4g' HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -ERC GVCF" 
 
+
+rule map_reads:
+    input:
+        genome="data/GCA_904849725_genome.fa",
+        read1="data/samples/{sample}_1.fastq",
+        read2="data/samples/{sample}_2.fastq"
+    output:
+        "results/mapped/{sample}_RG.bam"
+    params:
+        rg="-R @RG\tID:barley_{sample}\tSM:sample_{sample}\tPL:ILLUMINA"
+
+    conda:
+        "env/mapping.yaml"
+    shell:
+        "bwa mem -t4 {params.rg} {input.genome} {input.read1} {input.read2} | samtools view -b - > {output}"
+
+WORKS MAPPING AND RG HEAD
+rule map_reads:
+    input:
+       genome="data/GCA_904849725_genome.fa",
+       read1="data/samples/{sample}_1.fastq",
+       read2="data/samples/{sample}_2.fastq"
+    output:
+       "results/mapped/{sample}_RG.bam"
+    params:
+        rg=r"-R '@RG\tID:Seq01a\tSM:sample_A_1_21\tPL:ILLUMINA'"
+    conda:
+       "env/mapping.yaml"
+    shell:
+       "bwa mem {params.rg} {input.genome} {input.read1} {input.read2} > {output}"
 
