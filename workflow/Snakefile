@@ -201,7 +201,7 @@ rule map_reads:
     conda:
        "env/mapping.yaml"
     shell:
-       "bwa mem {params.rg} {input.genome} {input.read1} {input.read2} > {output}"
+       "bwa mem {params.rg} {input.genome} {input.read1} {input.read2} | samtools view -Sb - > {output}"
 MAS PRUEBAS
 
 
