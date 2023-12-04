@@ -202,4 +202,28 @@ rule map_reads:
        "env/mapping.yaml"
     shell:
        "bwa mem {params.rg} {input.genome} {input.read1} {input.read2} > {output}"
+MAS PRUEBAS
+
+
+rule mark_duplicates:
+   input: 
+       "results/sorted/{sample}_sorted.bam"
+   output:
+       marked_bam="results/duplicated/{sample}_marked.bam",
+       metrics="results/duplicated/{sample}_marked.txt"
+   shell:
+       "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk MarkDuplicates -I {input} -O {output.marked_bam} -M {output.metrics} "
+
+
+rule variant_discovery:
+    input:
+        ref= "data/GCA_904849725_genome.fa",
+        bam= "results/duplicated/{sample}_marked.bam"
+
+    output:
+        "results/variant_discovery/{sample}_HC.g.vcf.gz"
+
+    shell:
+         "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options '-Xmx4g' HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -ERC GVCF" 
+
 
