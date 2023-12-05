@@ -255,4 +255,96 @@ rule variant_discovery:
     shell:
          "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options '-Xmx4g' HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -ERC GVCF" 
 
+______________________________________________________---5/12
+
+rule sort_bam:
+    input:
+        "results/mapped/{sample}_RG.bam"
+    output:
+        "results/sorted/{sample}_sorted.bam"
+    conda:
+        "env/mapping.yaml"
+    shell:
+        "samtools sort -o {output} {input}"
+
+rule mark_duplicates:
+    input: 
+        "results/sorted/{sample}_sorted.bam"
+    output:
+        marked_bam="results/noduplicated/{sample}_nodup.bam",
+        metrics="results/noduplicated/{sample}_nodup.txt"
+    shell:
+        "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk MarkDuplicates -I {input} -O {output.marked_bam} -M {output.metrics}"
+
+rule samtools_sort:
+    input:
+        "results/noduplicated/{sample}_nodup.bam"
+    output:
+        "results/noduplicated/{sample}_nodup_sorted.bam"
+    conda:
+        "env/mapping.yaml"
+    shell:
+        "samtools sort -o {output} {input}"
+
+rule index_bam:
+   input:
+      "results/snoduplicated/{sample}_nodup_sorted.bam"
+   output:
+      "results/noduplicated/{sample}.bam.csi"
+   shell:
+      "samtools index -c {input}"
+      
+rule haplotype_caller:
+    input:
+        bam="results/noduplicated/{sample}.bam.csi",
+        ref="data/GCA_904849725_genome.fa"
+    output:
+        "calls/{sample}.g.vcf"
+    log:
+        "logs/gatk/haplotypecaller/{sample}.log"
+    shell:
+        "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options '-DGATK_STACKTRACE_ON_USER_EXCEPTION=true' HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -ERC GVCF" 
+
+
+rule mark_duplicates:
+    input: 
+        "results/sorted/{sample}_sorted.bam"
+    output:
+        marked_bam="results/noduplicated/{sample}_nodup.bam",
+        metrics="results/noduplicated/{sample}_nodup.txt"
+    shell:
+        "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk MarkDuplicates -I {input} -O {output.marked_bam} -M {output.metrics}"
+
+rule samtools_sort:
+    input:
+        "results/noduplicated/{sample}_nodup.bam"
+    output:
+        "results/noduplicated/{sample}_nodup_sorted.bam"
+    conda:
+        "env/mapping.yaml"
+    shell:
+        "samtools sort -o {output} {input}"
+
+rule index_bam:
+   input:
+      "results/snoduplicated/{sample}_nodup_sorted.bam"
+   output:
+      "results/noduplicated/{sample}.bam.csi"
+   shell:
+      "samtools index -c {input}"
+      
+rule haplotype_caller:
+    input:
+        bam="/home/cmiravete/project/snakemake-project/results/noduplicated/{sample}.bam.csi",
+        ref="/home/cmiravete/project/snakemake-project/data/GCA_904849725_genome.fa"
+    output:
+        "calls/{sample}.g.vcf"
+    #log:
+    #    "logs/gatk/haplotypecaller/{sample}.log"
+    shell:
+        "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options  '-Xmx4g'  HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -ERC GVCF" 
+
+#S'-DGATK_STACKTRACE_ON_USER_EXCEPTION=true'
+
+
 
