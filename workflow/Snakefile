@@ -4,6 +4,35 @@ rule all:
     input:
        expand("results/variant_discovery/{sample}_HC.g.vcf",sample=samples)
 
+rule all: #this is to start with that file (in terminal: snakemake -n)
+    input:
+        "plots/quals.svg"
+
+
+#Step 1: DESCOMPRESS tic
+rule descompress:
+    input:
+        "data/compressed_samples/{sample}.fastq.gz"
+        "data/compressed_samples/{samples}.fastq.gz"
+    output:
+        "data/samples/{sample}.fastq"
+        "data/samples/{samples}.fastq"
+    shell:
+        "gunzip -c {input} > {output}" 
+
+#Step 2: QUALITY CONTROL tic
+rule quality_control:
+    input:
+        "data/samples/{samples}.fastq"
+    output:
+        "results/reports/{samples}.html"
+        "data/samples/{samples}_fastqc.html"
+    shell:
+        "fastqc {input} | mv *html {output}"
+
+        "fastqc {input} | mv {output} > results/reports"
+
+#MAPPING
 rule map_reads:
     input:
         genome="data/GCA_904849725_genome.fa",
