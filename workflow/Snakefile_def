@@ -1,1 +1,110 @@
+samples=["A_1_21"]
+
+#Step 0: rule to run all the programs 
+
+rule all:
+   input:
+      expand("calls/{sample}.g.vcf",sample=samples)
+
+#Step 1: DESCOMPRESS 
+rule descompress:
+    input:
+        "data/compressed_samples/{sample}.fastq.gz"
+        "data/compressed_samples/{samples}.fastq.gz"
+    output:
+        "data/samples/{sample}.fastq"
+        "data/samples/{samples}.fastq"
+    shell:
+        "gunzip -c {input} > {output}" 
+
+#Step 2: QUALITY CONTROL
+rule quality_control:
+    input:
+        "data/samples/{samples}.fastq"
+    output:
+        "results/reports/{samples}.html"
+        "data/samples/{samples}_fastqc.html"
+    shell:
+        "fastqc {input} | mv *html {output}"
+
+        "fastqc {input} | mv {output} > results/reports"
+
+#-------Depth Analysis-----------
+#rule depth_calc:
+#    input:
+#        "results/sorted/{sample}_sorted.bam"
+#    output:
+#        "results/depth/{sample}_depth.csv"
+#    shell:
+#        "samtools depth {input} > {output}"
+
+#rule plot_depth:
+#    input:
+#        "results/depth/{sample}_depth.csv"
+#    output:
+#        "results/depth/plots/{sample}.svg"
+#    script:
+#        "plot-depth.py"
+
+#-------Depth Analysis-----------
+
+
+#Step 3: Prepare reference genome
+
+rule ref_genome:
+    input:
+      
+
+
+#Step 4: MAPPING
+
+rule map_reads:
+    input:
+       genome="data/GCA_904849725_genome.fa",
+       read1="data/samples/{sample}_1.fastq",
+       read2="data/samples/{sample}_2.fastq"
+    output:
+       "results/mapped/{sample}_RG.bam"
+    params:
+        rg=r"-R '@RG\tID:Seq01a\tSM:sample_A_1_21\tPL:ILLUMINA'"
+    conda:
+       "env/mapping.yaml"
+    shell:
+       "bwa mem {params.rg} {input.genome} {input.read1} {input.read2} | samtools view -Sb - > {output}"
+   
+#STEP 5: SORT MAPPED READS
+
+rule sort_bam:
+    input:
+        "results/mapped/{sample}_RG.bam"
+    output:
+        "results/sorted/{sample}_sorted.bam"
+    conda:
+        "env/mapping.yaml"
+    shell:
+        "samtools sort -o {output} {input}"
+
+#STEP 6: Mark duplicates and remove them 
+rule mark_duplicates:
+    input: 
+        "results/sorted/{sample}_sorted.bam"
+    output:
+        marked_bam="results/markdup/{sample}_nodup.bam",
+        metrics="results/markdup/{sample}_nodup.txt"
+    shell:
+        "java -jar /home/cmiravete/Descargas/picard.jar  MarkDuplicates -I {input} -O {output.marked_bam} -M {output.metrics}"
+
+#STEP 7: INDEXING THE OUTPUT FILE AFTER SORT
+#samtools index -c /home/cmiravete/project/snakemake-project/results/markdup/A_1_21_nodup.bam
+
+#STEP 8: VARIANT CALLING
+rule haplotype_caller:
+    input:
+        bam="results/markdup/{sample}_nodup.bam",
+        ref="/home/cmiravete/project/snakemake-project/data/GCA_904849725_genome.fa"
+    output:
+        "calls/{sample}.g.vcf"
+    shell:
+        "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options  '-Xmx4g'  HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -ERC GVCF" 
+
 
