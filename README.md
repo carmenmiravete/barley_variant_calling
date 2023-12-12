@@ -47,11 +47,11 @@ Process:
     snakemake -p results/reports/data/samples/{A_1_20_1,A_1_20_1}.html  -c4
 
 ## 3. MAPPING
-# Files in use:
+### Files in use:
 - GCA_904849725_genome.fa
 - SAMPLES: A_1_20_1 and A_1_20_2
 
-# 3.1. Index the reference genome 
+### 3.1. Index the reference genome 
 
 It can be done from Terminal:
 
@@ -59,8 +59,8 @@ It can be done from Terminal:
 
 Or you can find the respective rule in the Snakefile called rule ref_genome.
 
-# 3.2. Map the single end reads and get BAM file
-# 3.3. Map the paired ends reads and get the output BAM file
+### 3.2. Map the single end reads and get BAM file
+### 3.3. Map the paired ends reads and get the output BAM file
 
 
 
