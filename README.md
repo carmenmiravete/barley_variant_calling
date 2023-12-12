@@ -53,7 +53,11 @@ Process:
 
 # 3.1. Index the reference genome 
 
-    snakemake -p results/reports/data/samples/{A_1_20_1,A_1_20_1}.html  -c4
+It can be done from Terminal:
+
+    bwa index -a bwtsw data/GCA_904849725_genome.fa
+
+Or you can find the respective rule in the Snakefile called rule ref_genome.
 
 # 3.2. Map the single end reads and get BAM file
 # 3.3. Map the paired ends reads and get the output BAM file
