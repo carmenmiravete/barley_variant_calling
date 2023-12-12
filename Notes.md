@@ -30,7 +30,7 @@ In the terminal:
 
 the cursor places itself after the last line.
 
-    osboxes@osboxes:~$
+    snakemake -p data/samples/{A_1_21_1,A_1_21_2}.fastq -c4
     osboxes@osboxes:~$
     osboxes@osboxes:~$
     osboxes@osboxes:~$
