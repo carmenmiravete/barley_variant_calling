@@ -59,8 +59,18 @@ It can be done from Terminal:
 
 Or you can find the respective rule in the Snakefile called rule ref_genome.
 
-### 3.2. Map the single end reads and get BAM file
-### 3.3. Map the paired ends reads and get the output BAM file
+### 3.2. Map the paired ends reads and get the output BAM file
+The mapping reads information is in the rule map_reads in the Snakefile. 
+
+To run this rule, introduce the following code in the terminal
+
+    snakemake -p results/sorted/A_1_21_sorted.bam
+
+### 3.3. Map the single end reads 
+Single end Read alignment:
+    bwa aln -f data/GCA_904849725_genome.fa Single_End_Sample.fastq 
+
+
 
 
 
