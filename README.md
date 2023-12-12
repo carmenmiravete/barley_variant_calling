@@ -1,7 +1,7 @@
 # barley_variant_calling
 Repository practice project in EEAD-CSIC
 
-## Introduction
+## INTRODUCTION
 
 The main objective is to analyse the variant calling with GATK. To achive that goal I will follow the following process.
 1. Prepare Data
