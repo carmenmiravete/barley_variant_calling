@@ -4,7 +4,7 @@ Repository practice project in EEAD-CSIC
 ## Introduction
 
 The main objective is to analyse the variant calling with GATK. To achive that goal I will follow the following process.
-1. Prepare DAta
+1. Prepare Data
 1. Quality Control
 2. Mapping
 3. Variant calling
@@ -77,10 +77,54 @@ There ir a rule called rule sort_bam. To run this rule, we must write the follow
 
     snakemake -p results/sorted/A_1_20_sorted.bam  -c4
 
-## 
+## 3.4. Visualize the map reads in IGV
+
+#Step 5: Depth calculation
+
+rule depth_calc:
+    input:
+        "results/mapped/{sample}.bam"
+    output:
+        "results/depth/{sample}_depth.csv"
+    shell:
+        "samtools depth {input} > {output}"
+
+#Step 6: Show th depth in a plot
+
+rule plot_depth:
+    input:
+        "results/depth/{sample}_depth.csv"
+    output:
+        "results/depth/plots/{sample}.svg"
+    script:
+        "plot-depth.py"
+
+        
+## 4. FIGURE MAPPING CHROMOSOME
+### 4.1. Depth calculation
+
+First of all, we need to calculate the depth. For this calculation, we use the rule depth_calc, where we get a .csv output. 
+
+To run the rule, write this code in the terminal:
+
+    snakemake -p results/depth/A_1_20_depth.csv  -c4
+
+### 4.1. Show depth in a plot
+For this step, we are going to use python 3. However, you can use the programm you want to visualize the data.
+
+You can find the program I did in the directory workflow/scripts
+
+## 5. VARIANT CALLING
+
+Software used in this practical:
+- Picard 
+- GATK
+  
+Installing GATK
 
 
-
+# 5.1. Mark Duplicates
+We are using the 
 
 
 
