@@ -27,9 +27,7 @@ Make a rule to decompress the files.
 
 In the terminal: 
 
-´snakemake -p data/samples/{A_1_21_1,A_1_21_2}.fastq -c4´
-
-    snakemake -p data/samples/{A_1_21_1,A_1_21_2}.fastq -c4
+    snakemake -p data/samples/{A_1_21_1,A_1_21_2}.fastq.gz -c4
 
 
 
