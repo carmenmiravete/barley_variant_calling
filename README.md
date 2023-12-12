@@ -59,7 +59,7 @@ It can be done from Terminal:
 
 Or you can find the respective rule in the Snakefile called rule ref_genome.
 ### 3.2. Mapping (bwa mem)
-### 3.2.1 Map the paired ends reads and get the output BAM file
+#### 3.2.1 Map the paired ends reads and get the output BAM file
 The mapping reads information is in the rule map_reads in the Snakefile. 
 
 To run this rule, introduce the following code in the terminal
@@ -77,7 +77,7 @@ There ir a rule called rule sort_bam. To run this rule, we must write the follow
 
     snakemake -p results/sorted/A_1_20_sorted.bam  -c4
 
-## 3.4. Visualize the map reads in IGV
+### 3.4. Visualize the map reads in IGV
 
 #Step 5: Depth calculation
 
@@ -123,7 +123,7 @@ Software used in this practical:
 Installing GATK
 
 
-# 5.1. Mark Duplicates
+### 5.1. Mark Duplicates
 We are using the 
 
 
