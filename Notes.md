@@ -18,14 +18,25 @@ Samples: 32 samples of barley
 ## STARTING WITH SNAKEMAKE
 This tutorial introduces the text-based workflow system Snakemake: https://snakemake.readthedocs.io/en/stable/tutorial/setup.html 
 
+#Alll the rules are in the Snakemakefile in workflow Directory
 ## 1. DESCOMPRESS FILES
 It is possible that the files are compressed.
 
-I made a rule descompressed:
+Make a rule to decompress the files. 
 
 In the terminal: 
 
 ´snakemake -p data/samples/{A_1_21_1,A_1_21_2}.fastq -c4´
+
+the cursor places itself after the last line.
+
+    osboxes@osboxes:~$
+    osboxes@osboxes:~$
+    osboxes@osboxes:~$
+    osboxes@osboxes:~$
+
+This means that your keyboard is now bound to the terminal. In other terms, the terminal is *listening* to your keyboard, and you could start sending **commands** to it.
+
 
 ## 2. QUALITY CONTROL
 
