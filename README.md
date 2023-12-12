@@ -49,7 +49,7 @@ Process:
 ## 3. MAPPING
 ### Files in use:
 - GCA_904849725_genome.fa
-- SAMPLES: A_1_20_1 and A_1_20_2
+- SAMPLES: A_1_20_1 and A_1_20_2 
 
 ### 3.1. Index the reference genome 
 
@@ -77,7 +77,7 @@ There ir a rule called rule sort_bam. To run this rule, we must write the follow
 
     snakemake -p results/sorted/A_1_20_sorted.bam  -c4
 
-##
+## 
 
 
 
