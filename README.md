@@ -4,13 +4,10 @@ Repository practice project in EEAD-CSIC
 ## Introduction
 
 The main objective is to analyse the variant calling with GATK. To achive that goal I will follow the following process.
-
+1. Prepare DAta
 1. Quality Control
-2. Preprocessing
-3. (Assembly)
-4. Mapping
-5. (Annotation)
-6. Variant calling
+2. Mapping
+3. Variant calling
 
 
 Genome reference MorexV
@@ -23,7 +20,7 @@ Alll the rules are in the Snakemakefile in workflow Directory
 
 ## DATA
 
-We need a paired end couple of samples or a single end. In this repository, we have two samples "A_1_20_1" and "A_1_20_2" in the data/samples directory. Besides, in the data directory we can find the whole genome reference. 
+We need a paired end couple of samples or a single end. In this repository, we have two samples "A_1_20_1" and "A_1_20_2" in the data/samples directory. Besides, in the data directory we can find the whole genome reference: GCA_904849725_genome.fa
 
 
 ## 1. DESCOMPRESS FILES
@@ -33,8 +30,7 @@ Make a rule to decompress the files.
 
 In the terminal: 
 
-    snakemake -p data/samples/{A_1_21_1,A_1_21_2}.fastq.gz -c4
-
+    snakemake -p data/samples/{A_1_20_1,A_1_20_2}.fastq.gz -c4
 
 
 ## 2. QUALITY CONTROL
@@ -47,4 +43,22 @@ Process:
   Summary graphs
   Export results to an HTML based permanent report
 
-  For this process you must use 
+ 
+    snakemake -p results/reports/data/samples/{A_1_20_1,A_1_20_1}.html  -c4
+
+## 3. MAPPING
+# Files in use:
+- GCA_904849725_genome.fa
+- SAMPLES: A_1_20_1 and A_1_20_2
+
+# 3.1. Index the reference genome 
+
+    snakemake -p results/reports/data/samples/{A_1_20_1,A_1_20_1}.html  -c4
+
+# 3.2. Map the single end reads and get BAM file
+# 3.3. Map the paired ends reads and get the output BAM file
+
+
+
+
+  
