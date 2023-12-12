@@ -58,17 +58,26 @@ It can be done from Terminal:
     bwa index -a bwtsw data/GCA_904849725_genome.fa
 
 Or you can find the respective rule in the Snakefile called rule ref_genome.
-
-### 3.2. Map the paired ends reads and get the output BAM file
+### 3.2. Mapping (bwa mem)
+### 3.2.1 Map the paired ends reads and get the output BAM file
 The mapping reads information is in the rule map_reads in the Snakefile. 
 
 To run this rule, introduce the following code in the terminal
 
-    snakemake -p results/sorted/A_1_21_sorted.bam
+    snakemake -p results/sorted/A_1_21_RG.bam
 
-### 3.3. Map the single end reads 
+#### 3.2.1. Map the single end reads 
+It can be the case of map single end reads.
 Single end Read alignment:
     bwa aln -f data/GCA_904849725_genome.fa Single_End_Sample.fastq 
+
+### 3.3. Sort the bam file
+
+There ir a rule called rule sort_bam. To run this rule, we must write the following code in the Terminal:
+
+    snakemake -p results/sorted/A_1_20_sorted.bam  -c4
+
+##
 
 
 
