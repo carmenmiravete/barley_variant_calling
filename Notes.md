@@ -28,14 +28,8 @@ In the terminal:
 
 ´snakemake -p data/samples/{A_1_21_1,A_1_21_2}.fastq -c4´
 
-the cursor places itself after the last line.
-
     snakemake -p data/samples/{A_1_21_1,A_1_21_2}.fastq -c4
-    osboxes@osboxes:~$
-    osboxes@osboxes:~$
-    osboxes@osboxes:~$
 
-This means that your keyboard is now bound to the terminal. In other terms, the terminal is *listening* to your keyboard, and you could start sending **commands** to it.
 
 
 ## 2. QUALITY CONTROL
