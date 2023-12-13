@@ -1,0 +1,2 @@
+sample	unit	platform	fastq1	fastq2
+A_1_20	1	ILLUMINA	data/samples/A_1_20_1.fastq.gz	data/samples/A_1_20_2.fastq.gz
