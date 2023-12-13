@@ -22,6 +22,8 @@ Alll the rules are in the Snakemakefile in workflow Directory
 
 We need a paired end couple of samples or a single end. In this repository, we have two samples "A_1_20_1" and "A_1_20_2" in the data/samples directory. Besides, in the data directory we can find the whole genome reference: GCA_904849725_genome.fa
 
+To configure this workflow to use your own data, go to config directory and follow the instructions. 
+
 
 ## 1. DESCOMPRESS FILES
 It is possible that the files are compressed.
