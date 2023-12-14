@@ -1,4 +1,4 @@
-![dag-plot-included](https://github.com/carmenmiravete/barley_variant_calling/assets/151924636/67e738ff-4309-4036-9ccf-b32379afdba8)# barley_variant_calling
+# barley_variant_calling
 Repository practice project in EEAD-CSIC
 
 ## INTRODUCTION
@@ -136,5 +136,9 @@ GATK function
 
 ## TO VISUALIZE THE PROCESS WITH DAG
 
+![dag-plot-included](https://github.com/carmenmiravete/barley_variant_calling/assets/151924636/67e738ff-4309-4036-9ccf-b32379afdba8)
+
+
+    snakemake --dag -p | dot -Tsvg > dag.svg^C
 
  
