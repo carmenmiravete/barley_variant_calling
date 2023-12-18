@@ -1,3 +1,5 @@
+import pandas as pd
+
 configfile: "config/config.yaml"
 
 rule all:
@@ -9,6 +11,7 @@ rule all:
         expand("results/reports/{sample}_2.zip",sample=config["samples"]),
         expand("results/depth/plots/{sample}.svg",sample=config["samples"])
 
+
 #Step 1: DESCOMPRESS 
 rule descompress:
     input:
@@ -19,6 +22,8 @@ rule descompress:
         fq2=expand("data/samples/{sample}_2.fastq",sample=config["samples"])
     shell:
         "gunzip -c {input.gz1} > {output.fq1} | gunzip -c {input.gz2} > {output.fq2}"
+
+
 
 #Step 2: QUALITY CONTROL
 rule quality_control:
@@ -32,7 +37,17 @@ rule quality_control:
         zip2="results/reports/{sample}_2.zip"
     shell:
         "fastqc {input}"
-        
+
+"""rule fastqc:
+    input:
+        unpack(get_fastq),
+    output:
+        html="results/qc/fastqc/{sample}-{unit}.html",
+        zip="results/qc/fastqc/{sample}-{unit}.zip",
+    log:
+        "logs/fastqc/{sample}-{unit}.log",
+    shell:
+        "0.74.0/bio/fastqc"""   
 
 rule map_reads:
     input:
@@ -40,13 +55,14 @@ rule map_reads:
        read1="data/samples/{sample}_1.fastq",
        read2="data/samples/{sample}_2.fastq"
     output:
-       "results/mapped/{sample}_RG.bam"
+       temp("results/mapped/{sample}_RG.bam")
     params:
-        rg=r"-R '@RG\tID:Seq01a\tSM:sample_A_1_21\tPL:ILLUMINA'"
+        rg=r"-R '@RG\tID:{sample}\tSM:{sample}\tPL:ILLUMINA'"
     conda:
        "env/mapping.yaml"
+    threads: 16
     shell:
-       "bwa mem {params.rg} {input.genome} {input.read1} {input.read2} | samtools view -Sb - > {output}"
+       "bwa mem {params.rg} -t {threads} {input.genome} {input.read1} {input.read2} | samtools view -Sb - > {output}"
    
 #STEP 5: SORT MAPPED READS
 
@@ -109,3 +125,5 @@ rule haplotype_caller:
         "calls/{sample}.g.vcf"
     shell:
         "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options  '-Xmx4g'  HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -ERC GVCF" 
+
+        
