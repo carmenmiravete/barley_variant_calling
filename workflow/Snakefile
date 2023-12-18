@@ -49,6 +49,15 @@ rule quality_control:
     shell:
         "0.74.0/bio/fastqc"""   
 
+#Step 3: INDEX GENOME
+rule ref_genome:
+input:
+"data/GCA_904849725_genome.fa"
+shell:
+"bwa index -a bwtsw {input}"
+
+#Step 4: Mapping
+
 rule map_reads:
     input:
        genome="data/GCA_904849725_genome.fa",
