@@ -32,7 +32,7 @@ To use all the program at one, write in the TErminal the following code:
 
 -c or --cores you can select the number of cores you want
 
-#STEP BY STEP
+# STEP BY STEP
 ## 1. DESCOMPRESS FILES
 It is possible that the files are compressed.
 
