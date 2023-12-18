@@ -26,13 +26,15 @@ To configure this workflow to use your own data, go to config directory and foll
 
 # TO USE THIS REPOSITORY
 
-CLone this repository
+CLone this repository:
 
     git clone https://github.com/carmenmiravete/barley_variant_calling.git
 
-Change to snakemake-project directory
+Change to barley_variant_calling directory:
 
-    cd p
+    cd barley_variant_calling
+
+Run from the Terminal the following code:
     snakemake -p -c4
 
 -c or --cores you can select the number of cores you want
