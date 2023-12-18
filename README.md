@@ -24,7 +24,7 @@ We need a paired end couple of samples or a single end. In this repository, we h
 
 To configure this workflow to use your own data, go to config directory and follow the instructions. 
 
-#TO USE THIS REPOSITORY
+# TO USE THIS REPOSITORY
 To use all the program at one, write in the TErminal the following code:
 
 
@@ -32,6 +32,7 @@ To use all the program at one, write in the TErminal the following code:
 
 -c or --cores you can select the number of cores you want
 
+#STEP BY STEP
 ## 1. DESCOMPRESS FILES
 It is possible that the files are compressed.
 
