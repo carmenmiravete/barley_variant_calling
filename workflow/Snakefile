@@ -5,6 +5,7 @@ rule all:
         expand("data/samples/{sample}_{unit}_fastqc.html",sample=config["samples"], unit=config["units"]),
         expand("data/samples/{sample}_{unit}_fastqc.zip",sample=config["samples"], unit=config["units"]),
         expand("results/depth/plots/{sample}.svg",sample=config["samples"]),
+        expand("results/markdup/{sample}_nodup.bam.csi",sample=config["samples"]),
         expand("calls/{sample}.g.vcf",sample=config["samples"])
 
 
@@ -57,7 +58,7 @@ rule map_reads:
        read1="data/samples/{sample}_1.fastq",
        read2="data/samples/{sample}_2.fastq"
     output:
-       "results/mapped/{sample}_RG.bam"
+       temp("results/mapped/{sample}_RG.bam")
     params:
         rg=r"-R '@RG\tID:Seq01a\tSM:sample_A_1_21\tPL:ILLUMINA'"
     conda:
@@ -112,6 +113,31 @@ rule samtools_index:
     input:
         "results/markdup/{sample}_nodup.bam"
     output:
-        "results/markdup/{sample}_nodup.bam"
+        "results/markdup/{sample}_nodup.bam.csi"
     shell:
-        "samtools index -c {input}"
+        "samtools index -c {input} {output}"
+
+#STEP 8: VARIANT CALLING
+#rule haplotype_caller:
+#    input:
+#        bam="results/markdup/{sample}_nodup.bam",
+#        ref="/home/cmiravete/project/snakemake-project/data/GCA_904849725_genome.fa"
+#    output:
+#        "calls/{sample}.g.vcf"
+#    threads: 4
+
+#    shell:
+#        "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options  '-Xmx4g'  HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -ERC GVCF" 
+
+
+rule haplotype_caller:
+    input:
+        bam="results/markdup/{sample}_nodup.bam",
+        ref="data/GCA_904849725_genome.fa"
+    output:
+        "calls/{sample}.g.vcf"
+    shell:
+        "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options  '-Xmx4g'  HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -ERC GVCF" 
+
+#/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options  '-Xmx4g'  HaplotypeCaller -R /home/cmiravete/project/snakemake-project/data/GCA_904849725_genome.fa -I results/markdup/A_1_20_nodup.bam -O calls/A_1_20.g.vcf.gz -ERC GVCF
+
