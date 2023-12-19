@@ -1,2 +1,5 @@
 samples:
-  C2KPVACXX_1_20 #name of the sample
+  A_1_20 #name of your samples
+
+units:
+  ["1","2"]
