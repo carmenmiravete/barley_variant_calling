@@ -12,11 +12,11 @@ rule all:
 #Step 1: DESCOMPRESS 
 rule descompress:
     input:
-        gz1=expand("data/samples/{sample}_1.fastq.gz",sample=config["samples"]),
-        gz2=expand("data/samples/{sample}_2.fastq.gz", sample=config["samples"])
+        gz1=expand("data/samples/{sample}{sep}1.fastq.gz",sample=config["samples"],sep=config["separation"]),
+        gz2=expand("data/samples/{sample}{sep}2.fastq.gz", sample=config["samples"],sep=config["separation"])
     output:
-        fq1=expand("data/samples/{sample}_1.fastq",sample=config["samples"]),
-        fq2=expand("data/samples/{sample}_2.fastq",sample=config["samples"])
+        fq1=expand("data/samples/{sample}{sep}1.fastq",sample=config["samples"],sep=config["separation"]),
+        fq2=expand("data/samples/{sample}{sep}2.fastq",sample=config["samples"],sep=config["separation"])
     shell:
         "gunzip -c {input.gz1} > {output.fq1} | gunzip -c {input.gz2} > {output.fq2}"
 
@@ -46,25 +46,26 @@ rule quality_control:
 #Step 3: INDEX GENOME
 rule ref_genome:
     input:
-        "data/GCA_904849725_genome.fa"
+        genome=config["genome"]
     shell:
-        "bwa index -a bwtsw {input}"
+        "bwa index -a bwtsw {input.genome}"
 
 #Step 4: Mapping
 
 rule map_reads:
     input:
-       genome="data/GCA_904849725_genome.fa",
-       read1="data/samples/{sample}_1.fastq",
-       read2="data/samples/{sample}_2.fastq"
+       genome=config["genome"],
+       read1=expand("data/samples/{sample}{sep}1.fastq", sample=config["samples"],sep=config["separation"]), 
+       read2=expand("data/samples/{sample}{sep}2.fastq", sample=config["samples"],sep=config["separation"])
     output:
        temp("results/mapped/{sample}_RG.bam")
     params:
         rg=r"-R '@RG\tID:Seq01a\tSM:sample_A_1_21\tPL:ILLUMINA'"
     conda:
        "env/mapping.yaml"
+    threads: 16
     shell:
-       "bwa mem {params.rg} {input.genome} {input.read1} {input.read2} > {output}"   
+       "bwa mem {params.rg} -t {threads} {input.genome} {input.read1} {input.read2} > {output}"   
 #STEP 5: SORT MAPPED READS
 
 rule sort_bam:
@@ -111,11 +112,11 @@ rule mark_duplicates:
 
 rule samtools_index:
     input:
-        "results/markdup/{sample}_nodup.bam"
+        marked_bam="results/markdup/{sample}_nodup.bam"
     output:
         "results/markdup/{sample}_nodup.bam.csi"
     shell:
-        "samtools index -c {input} {output}"
+        "samtools index -c {input.marked_bam} {output}"
 
 #STEP 8: VARIANT CALLING
 #rule haplotype_caller:
@@ -132,12 +133,12 @@ rule samtools_index:
 
 rule haplotype_caller:
     input:
+        index="results/markdup/{sample}_nodup.bam.csi",
         bam="results/markdup/{sample}_nodup.bam",
-        ref="data/GCA_904849725_genome.fa"
+        ref=config["genome"]
     output:
         "calls/{sample}.g.vcf"
     shell:
         "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options  '-Xmx4g'  HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -ERC GVCF" 
 
 #/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options  '-Xmx4g'  HaplotypeCaller -R /home/cmiravete/project/snakemake-project/data/GCA_904849725_genome.fa -I results/markdup/A_1_20_nodup.bam -O calls/A_1_20.g.vcf.gz -ERC GVCF
-
