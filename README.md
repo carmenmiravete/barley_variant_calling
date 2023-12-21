@@ -35,6 +35,7 @@ Change to barley_variant_calling directory:
     cd barley_variant_calling
 
 Run from the Terminal the following code:
+    
     snakemake -p -c4
 
 -c or --cores you can select the number of cores you want
