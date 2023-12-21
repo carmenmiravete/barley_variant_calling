@@ -1,5 +1,6 @@
 configfile: "config/config.yaml"
 
+#Step 0: THIS IS TO RUN ALL THE RULES THAT WE ARE INTERESTED IN 
 rule all:
    input:
         expand("data/samples/{sample}_{unit}_fastqc.html",sample=config["samples"], unit=config["units"]),
@@ -31,17 +32,7 @@ rule quality_control:
         zip="data/samples/{sample}_{unit}_fastqc.zip",
     shell:
         "fastqc {input}"
-
-"""rule fastqc:
-    input:
-        unpack(get_fastq),
-    output:
-        html="results/qc/fastqc/{sample}-{unit}.html",
-        zip="results/qc/fastqc/{sample}-{unit}.zip",
-    log:
-        "logs/fastqc/{sample}-{unit}.log",
-    shell:
-        "0.74.0/bio/fastqc"""   
+  # wrapper: "0.74.0/bio/fastqc" This is another way to write the shell (where another author has done it)
 
 #Step 3: INDEX GENOME
 rule ref_genome:
@@ -50,7 +41,7 @@ rule ref_genome:
     shell:
         "bwa index -a bwtsw {input.genome}"
 
-#Step 4: Mapping
+#Step 4: MAPPING
 
 rule map_reads:
     input:
@@ -65,7 +56,8 @@ rule map_reads:
        "env/mapping.yaml"
     threads: 16
     shell:
-       "bwa mem {params.rg} -t {threads} {input.genome} {input.read1} {input.read2} > {output}"   
+       "bwa mem {params.rg} -t {threads} {input.genome} {input.read1} {input.read2} > {output}"  
+
 #STEP 5: SORT MAPPED READS
 
 rule sort_bam:
@@ -78,7 +70,7 @@ rule sort_bam:
     shell:
         "samtools sort -o {output} {input}"
 
-#DEPTH CALC
+# Step 6: DEPTH CALC (To know the depth and make a representation)
 
 rule depth_calc:
     input:
@@ -88,6 +80,8 @@ rule depth_calc:
     shell:
         "samtools depth {input} > {output}"
 
+#Representing the plot
+
 rule plot_depth:
     input:
         "results/depth/{sample}_depth.csv"
@@ -96,7 +90,7 @@ rule plot_depth:
     script:
         "./scripts/plot-depth.py"        
 
-#STEP 6: Mark duplicates and remove them 
+#STEP 7: Mark duplicates  
 rule mark_duplicates:
     input: 
         "results/sorted/{sample}_sorted.bam"
@@ -106,9 +100,8 @@ rule mark_duplicates:
     shell:
         "java -jar /home/cmiravete/Descargas/picard.jar  MarkDuplicates -I {input} -O {output.marked_bam} -M {output.metrics}"
 
-#STEP 7: INDEXING THE OUTPUT FILE AFTER SORT
+#STEP 8: INDEXING THE OUTPUT FILE 
 #samtools index -c /home/cmiravete/project/snakemake-project/results/markdup/A_1_21_nodup.bam
-
 
 rule samtools_index:
     input:
@@ -119,17 +112,6 @@ rule samtools_index:
         "samtools index -c {input.marked_bam} {output}"
 
 #STEP 8: VARIANT CALLING
-#rule haplotype_caller:
-#    input:
-#        bam="results/markdup/{sample}_nodup.bam",
-#        ref="/home/cmiravete/project/snakemake-project/data/GCA_904849725_genome.fa"
-#    output:
-#        "calls/{sample}.g.vcf"
-#    threads: 4
-
-#    shell:
-#        "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options  '-Xmx4g'  HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -ERC GVCF" 
-
 
 rule haplotype_caller:
     input:
@@ -138,7 +120,7 @@ rule haplotype_caller:
         ref=config["genome"]
     output:
         "calls/{sample}.g.vcf"
+    threads: 8 
     shell:
         "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options  '-Xmx4g'  HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -ERC GVCF" 
 
-#/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options  '-Xmx4g'  HaplotypeCaller -R /home/cmiravete/project/snakemake-project/data/GCA_904849725_genome.fa -I results/markdup/A_1_20_nodup.bam -O calls/A_1_20.g.vcf.gz -ERC GVCF
