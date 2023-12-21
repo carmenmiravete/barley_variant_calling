@@ -1,5 +1,7 @@
 samples:
   A_1_20 #name of your samples
 
+genome: "path/to/your/genome.fa"
+
 units:
   ["1","2"]
