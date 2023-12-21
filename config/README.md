@@ -20,4 +20,6 @@ The config.yaml is a file where you must specify the following information:
   - separation: this is the symbol that is between the root and the unit in the sample name. 
            separation: _
 
+However, the samples you are going to study, must be inside the data/sample directory from this github repository. 
+
     
