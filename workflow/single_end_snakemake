@@ -1,0 +1,142 @@
+configfile: "config/config.yaml"
+
+rule all:
+   input:
+        expand("data/samples/{sample}_fastqc.html",sample=config["samples"]),
+        expand("data/samples/{sample}_fastqc.zip",sample=config["samples"]),
+        expand("results/depth/plots/{sample}.svg",sample=config["samples"]),
+        expand("results/markdup/{sample}_nodup.bam.csi",sample=config["samples"]),
+        expand("calls/{sample}.g.vcf",sample=config["samples"])
+
+
+#Step 1: DESCOMPRESS 
+rule descompress:
+    input:
+        compress=config["path"]
+    output:
+        fq="data/samples/{sample}.fastq"
+    shell:
+        "gunzip {input.compress}"
+
+
+
+#Step 2: QUALITY CONTROL
+rule quality_control:
+    input:
+        fq=expand("data/samples/{sample}.fastq",sample=config["samples"])
+    output:
+        html="data/samples/{sample}_fastqc.html",
+        zip="data/samples/{sample}_fastqc.zip"
+    shell:
+        "fastqc {input.fq}"
+
+"""rule fastqc:
+    input:
+        unpack(get_fastq),
+    output:
+        html="results/qc/fastqc/{sample}-{unit}.html",
+        zip="results/qc/fastqc/{sample}-{unit}.zip",
+    log:
+        "logs/fastqc/{sample}-{unit}.log",
+    shell:
+        "0.74.0/bio/fastqc"""   
+
+#Step 3: INDEX GENOME
+rule ref_genome:
+    input:
+        genome=config["genome"]
+    shell:
+        "bwa index -a bwtsw {input.genome}"
+
+#Step 4: Mapping
+
+rule map_reads:
+    input:
+       genome=config["genome"],
+       read=expand("data/samples/{sample}.fastq", sample=config["samples"])
+    output:
+       mapped="results/mapped/{sample}_RG.bam"
+    params:
+        rg=r"-R '@RG\tID:Seq01a\tSM:sample_A_1_21\tPL:ILLUMINA'"
+    conda:
+       "env/mapping.yaml"
+    threads: 16
+    shell:
+       "bwa mem {params.rg} -t {threads} {input.genome} {input.read} > {output.mapped}"   
+#STEP 5: SORT MAPPED READS
+
+rule sort_bam:
+    input:
+        "results/mapped/{sample}_RG.bam"
+    output:
+        "results/sorted/{sample}_sorted.bam"
+    conda:
+        "env/mapping.yaml"
+    shell:
+        "samtools sort -o {output} {input}"
+
+#DEPTH CALC
+
+rule depth_calc:
+    input:
+        "results/sorted/{sample}_sorted.bam"
+    output:
+        "results/depth/{sample}_depth.csv"
+    shell:
+        "samtools depth {input} > {output}"
+
+rule plot_depth:
+    input:
+        "results/depth/{sample}_depth.csv"
+    output:
+        "results/depth/plots/{sample}.svg"
+    script:
+        "./scripts/plot-depth.py"        
+
+#STEP 6: Mark duplicates and remove them 
+rule mark_duplicates:
+    input: 
+        "results/sorted/{sample}_sorted.bam"
+    output:
+        marked_bam="results/markdup/{sample}_nodup.bam",
+        metrics="results/markdup/{sample}_nodup.txt"
+    shell:
+        "java -jar /home/cmiravete/Descargas/picard.jar  MarkDuplicates -I {input} -O {output.marked_bam} -M {output.metrics}"
+
+#STEP 7: INDEXING THE OUTPUT FILE AFTER SORT
+#samtools index -c /home/cmiravete/project/snakemake-project/results/markdup/A_1_21_nodup.bam
+
+
+rule samtools_index:
+    input:
+        "results/markdup/{sample}_nodup.bam"
+    output:
+        "results/markdup/{sample}_nodup.bam.csi"
+    shell:
+        "samtools index -c {input} {output}"
+
+#STEP 8: VARIANT CALLING
+#rule haplotype_caller:
+#    input:
+#        bam="results/markdup/{sample}_nodup.bam",
+#        ref="/home/cmiravete/project/snakemake-project/data/GCA_904849725_genome.fa"
+#    output:
+#        "calls/{sample}.g.vcf"
+#    threads: 4
+
+#    shell:
+#        "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options  '-Xmx4g'  HaplotypeCaller -R {input.ref} -I {input.bam} -O {output} -ERC GVCF" 
+
+
+rule haplotype_caller:
+    input:
+        index="results/markdup/{sample}_nodup.bam.csi",
+        bam="results/markdup/{sample}_nodup.bam",
+        ref=config["genome"]
+    output:
+        "calls/{sample}.g.vcf"
+    threads: 8
+    shell:
+        "/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options  '-Xmx4g'  HaplotypeCaller -t {threads} -R {input.ref} -I {input.bam} -O {output} -ERC GVCF" 
+
+#/home/cmiravete/Descargas/gatk-4.4.0.0/gatk --java-options  '-Xmx4g'  HaplotypeCaller -R /home/cmiravete/project/snakemake-project/data/GCA_904849725_genome.fa -I results/markdup/A_1_20_nodup.bam -O calls/A_1_20.g.vcf.gz -ERC GVCF
