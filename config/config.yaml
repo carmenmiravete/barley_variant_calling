@@ -9,4 +9,14 @@ separation:
 
 genome: "path/to/your/genome.fa"
 
+----------------
 
+single-end
+
+path: "data/samples/C2KPVACXX_2_23_1.fastq.gz"
+
+samples: C2KPVACXX_2_23_1
+
+genome: "data/GCA_904849725_genome.fa"
+
+#prior_mutation_rate: 0.001
